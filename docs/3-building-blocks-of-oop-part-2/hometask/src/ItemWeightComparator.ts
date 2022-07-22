@@ -2,7 +2,14 @@ import { Item } from './Item';
 import { ItemComparator } from './ItemComparator';
 
 export class ItemWeightComparator implements ItemComparator {
-    public compare(first: Item, second: Item) {
-        // your code goes here
+    compare(first: Item, second: Item): number {
+        if (first.getWeigth() > second.getWeigth()) {
+            return 1;
+        }
+        if (first.getWeigth() < second.getWeigth()) {
+            return -1;
+        }
+
+        return first.compareTo(second)
     }
 }
