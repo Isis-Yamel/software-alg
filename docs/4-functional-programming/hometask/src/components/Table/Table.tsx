@@ -3,15 +3,16 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import styles from './Table.module.scss'
 
 export interface Row {
-  avatar: string
+  url: string
   username: string
   country: string
   name: string
-  lastPayments: number
+  payments: number
   posts: number
 }
 
@@ -21,6 +22,7 @@ interface TableProps {
 
 export function Table(props: TableProps) {
   const { rows } = props;
+  
   return (
     <div className={styles.container}>
       <div className={styles.tableBackground}>
@@ -46,22 +48,22 @@ export function Table(props: TableProps) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
+            {!!rows ? rows.map((row) => (
               <TableRow key={row.name}>
                 <TableCell align="left">
                   <img
                     className={styles.avatar}
-                    src={row.avatar}
+                    src={row.url}
                     alt="avatar"
                   />
                 </TableCell>
                 <TableCell align="left">{row.username}</TableCell>
                 <TableCell align="left">{row.country}</TableCell>
                 <TableCell align="left">{row.name}</TableCell>
-                <TableCell align="left">{row.lastPayments}</TableCell>
+                <TableCell align="left">{row.payments[0] ? row.payments[0].totalSum : 0}</TableCell>
                 <TableCell align="left">{row.posts}</TableCell>
               </TableRow>
-            ))}
+            )): <CircularProgress color="inherit"/>}
           </TableBody>
         </MuiTable>
       </div>
