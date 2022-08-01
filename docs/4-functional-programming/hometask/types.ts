@@ -20,3 +20,12 @@ export interface Account {
   posts: number;
   payments: Payment[];
 }
+
+export interface Rows {
+  url: string;
+  username: string;
+  country: string;
+  name: string;
+  payments: number;
+  posts: number;
+}

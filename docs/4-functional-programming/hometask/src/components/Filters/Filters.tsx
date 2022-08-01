@@ -1,21 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Checkbox from '@mui/material/Checkbox';
 
 import styles from './Filters.module.scss';
 
 interface FiltersProps {
-  store?: {};
-  updateStore?: (val) => void;
+  updateFilter?: (val) => void;
 }
-
-// OR
-
-//interface FiltersProps {
-//  selected?: {};
-//  updateSelected?: (val) => void;
-//}
-
-// OR store can be global
 
 const OPTIONS = [
   {
@@ -26,12 +16,10 @@ const OPTIONS = [
   },
 ];
 
-export function Filters(props: FiltersProps) {
+export function Filters({ updateFilter }: FiltersProps) {
   const [selectedFilter, setSelectedFilter] = useState<string[]>([]);
 
-  const onChange = ({ title }) => {
-    console.log(title); // for debugging
-
+  const onChange = ({ title }) => { 
     let updatedFilters;
     if (selectedFilter.find((filter) => filter === title)) {
       updatedFilters = selectedFilter.filter(
@@ -43,6 +31,10 @@ export function Filters(props: FiltersProps) {
 
     setSelectedFilter(updatedFilters);
   };
+
+  useEffect(() => {
+    updateFilter(selectedFilter)
+  }, [selectedFilter])
 
   return (
     <div className={styles.group}>
@@ -56,8 +48,7 @@ export function Filters(props: FiltersProps) {
           >
             <Checkbox
               checked={!!selectedFilter.find(filter => filter === option.title)}
-              value={option.title}
-              onChange={() => onChange(option)}
+              value={option.title} 
               size="small"
               color="primary"
             />{' '}
