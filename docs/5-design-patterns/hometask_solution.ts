@@ -23,6 +23,19 @@ class Shipment {
   public ship(shipId: number, shipFrom: string, shipTo: string, cost: number) {
     return `Shipment ID: ${shipId}. The item was ship from ${shipFrom} and it goes to ${shipTo}. The total cost was ${cost}`
   }
+
+  public getPackageType(weight: number): string {
+    let result;
+    if (weight <= 15) {
+      result = 'Letter'
+    } else if (weight > 15 && weight <+ 160) {
+      result = 'Package'
+    } else {
+      result = 'OverSized'
+    }
+
+    return result;
+  }
 }
 
 export interface CalculateCostByShipper {
@@ -49,20 +62,67 @@ class Shipper {
 }
 
 class AirEastShipper implements CalculateCostByShipper {
+  packageType: string
+  weigth: number
+  
+  constructor(packageType: string, weigth: number) {
+    this.packageType = packageType
+    this.weigth = weigth
+  }
   public getCost(): number {
-    return 39
+    let cost;
+    if (this.packageType === 'Letter') {
+      cost = 0.39 * this.weigth
+    } else if (this.packageType === 'Package') {
+      cost = 0.25 * this.weigth
+    } else {
+      cost = (0.25 * this.weigth) + 10
+    }
+    return cost
   }
 }
 
 class ChicagoSprinterShipper implements CalculateCostByShipper {
+  packageType: string
+  weigth: number
+  
+  constructor(packageType: string, weigth: number) {
+    this.packageType = packageType
+    this.weigth = weigth
+  }
+
   public getCost(): number {
-    return 42
+    let cost;
+    if (this.packageType === 'Letter') {
+      cost = 0.42 * this.weigth
+    } else if (this.packageType === 'Package') {
+      cost = 0.20 * this.weigth
+    } else {
+      cost = 0
+    }
+    return cost
   }
 }
 
 class PacificParcelShipper implements CalculateCostByShipper {
+  packageType: string
+  weigth: number
+  
+  constructor(packageType: string, weigth: number) {
+    this.packageType = packageType
+    this.weigth = weigth
+  }
+
   public getCost(): number {
-    return 51
+    let cost;
+    if (this.packageType === 'Letter') {
+      cost = 0.51 * this.weigth
+    } else if (this.packageType === 'Package') {
+      cost = 0.19 * this.weigth
+    } else {
+      cost = (0.19 * this.weigth) + (0.02 * this.weigth)
+    }
+    return cost
   }
 }
 
@@ -85,22 +145,26 @@ class Client {
   }
 
   ship() {
-    this.myInstance.ship(this.shipmentID, this.data.fromAddress, this.data.toAddress, 39)
+    return this.myInstance.ship(this.shipmentID, this.data.fromAddress, this.data.toAddress, this.getCost())
+  }
+
+  getPackageType() {
+    return this.myInstance.getPackageType(this.data.weight)
   }
 
   getCost(): number {
     let result;
 
     if(this.data.fromZipCode === '' || this.data.fromZipCode === null) {
-      result = new Shipper(new AirEastShipper())
+      result = new Shipper(new AirEastShipper(this.getPackageType(), this.data.weight))
     }
 
     if (this.data.fromZipCode.startsWith('1') || this.data.fromZipCode.startsWith('2') || this.data.fromZipCode.startsWith('3')) {
-      result = new Shipper(new AirEastShipper())
+      result = new Shipper(new AirEastShipper(this.getPackageType(), this.data.weight))
     } else if (this.data.fromZipCode.startsWith('4') || this.data.fromZipCode.startsWith('5') || this.data.fromZipCode.startsWith('6')) {
-      result = new Shipper(new ChicagoSprinterShipper())
+      result = new Shipper(new ChicagoSprinterShipper(this.getPackageType(), this.data.weight))
     } else {
-      result = new Shipper(new PacificParcelShipper())
+      result = new Shipper(new PacificParcelShipper(this.getPackageType(), this.data.weight))
     }
     return result;
   }
