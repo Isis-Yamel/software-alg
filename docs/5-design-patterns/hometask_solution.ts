@@ -1,5 +1,9 @@
 let counter = 0;
 
+interface Ship {
+  ship();
+}
+
 class Shipment {
   private static instace: Shipment
   private shipmentID: number
@@ -20,8 +24,12 @@ class Shipment {
     return this.shipmentID
   }
 
-  public ship(shipId: number, shipFrom: string, shipTo: string, cost: number) {
-    return `Shipment ID: ${shipId}. The item was ship from ${shipFrom} and it goes to ${shipTo}. The total cost was ${cost}`
+  public ship(shipId: number, shipFrom: string, shipTo: string, cost: number, marks?: []) {
+    if (!!marks && marks?.length > 0) {
+      return new MarksShipment(new SimpleShipment(shipId, shipFrom, shipTo, cost))
+    } else {
+      return new SimpleShipment(shipId, shipFrom, shipTo, cost)
+    }
   }
 
   public getPackageType(weight: number): string {
@@ -36,6 +44,35 @@ class Shipment {
 
     return result;
   }
+}
+
+class SimpleShipment implements Ship {
+  shipId: number
+  shipFrom: string
+  shipTo: string
+  cost: number
+
+  constructor(shipId: number, shipFrom: string, shipTo: string, cost: number) {
+    this.shipId = shipId
+    this.shipFrom = shipFrom
+    this.shipTo = shipTo
+    this.cost = cost
+  }
+  public ship() { return `Shipment ID: ${this.shipId}. The item was ship from ${this.shipFrom} and it goes to ${this.shipTo}. The total cost was ${this.cost}` }
+}
+
+class ShipmentDecorator implements Ship {
+  protected wrappee: Ship;
+
+  constructor(shipment: Ship) {
+    this.wrappee = shipment;
+  }
+
+  public ship() { return this.wrappee.ship(); }
+}
+
+class MarksShipment extends ShipmentDecorator {
+  public ship() { return this.wrappee.ship() + `** MARKS MARKS DELICATE` }
 }
 
 export interface CalculateCostByShipper {
@@ -127,6 +164,7 @@ class PacificParcelShipper implements CalculateCostByShipper {
 }
 
 interface ClientData {
+  specialMarks: []
   weight: number
   fromAddress: string
   fromZipCode: string
